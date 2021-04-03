@@ -1,0 +1,115 @@
+[spark@c2515-node2 root]$ spark-shell
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+Spark context Web UI available at http://c2515-node2.coelab.cloudera.com:4040
+Spark context available as 'sc' (master = yarn, app id = application_1616685143134_0028).
+Spark session available as 'spark'.
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /___/ .__/\_,_/_/ /_/\_\   version 2.4.0.7.1.1.0-565
+      /_/
+         
+Using Scala version 2.11.12 (OpenJDK 64-Bit Server VM, Java 1.8.0_232)
+Type in expressions to have them evaluated.
+Type :help for more information.
+
+scala> import spark.implicits._
+import spark.implicits._
+
+scala> val columns = Seq("language","users_count")
+columns: Seq[String] = List(language, users_count)
+
+scala> val data = Seq(("Java", "20000"), ("Python", "100000"), ("Scala", "3000"))
+data: Seq[(String, String)] = List((Java,20000), (Python,100000), (Scala,3000))
+
+scala> 
+
+scala> val rdd = spark.sparkContext.parallelize(data)
+rdd: org.apache.spark.rdd.RDD[(String, String)] = ParallelCollectionRDD[0] at parallelize at <console>:28
+
+scala> 
+
+scala> val dfFromRDD1 = rdd.toDF()
+dfFromRDD1: org.apache.spark.sql.DataFrame = [_1: string, _2: string]
+
+scala> dfFromRDD1.printSchema()
+root
+ |-- _1: string (nullable = true)
+ |-- _2: string (nullable = true)
+
+
+scala> val dfFromRDD1 = rdd.toDF("language","users_count")
+dfFromRDD1: org.apache.spark.sql.DataFrame = [language: string, users_count: string]
+
+scala> dfFromRDD1.printSchema()
+root
+ |-- language: string (nullable = true)
+ |-- users_count: string (nullable = true)
+
+
+scala> val dfFromRDD2 = spark.createDataFrame(rdd).toDF(columns:_*)
+dfFromRDD2: org.apache.spark.sql.DataFrame = [language: string, users_count: string]
+
+scala> 
+
+scala> import org.apache.spark.sql.types.{StringType, StructField, StructType}
+import org.apache.spark.sql.types.{StringType, StructField, StructType}
+
+scala> import org.apache.spark.sql.Row
+import org.apache.spark.sql.Row
+
+scala> val schema = StructType( Array(
+     |                  StructField("language", StringType,true),
+     |                  StructField("language", StringType,true)
+     |              ))
+schema: org.apache.spark.sql.types.StructType = StructType(StructField(language,StringType,true), StructField(language,StringType,true))
+
+scala> val rowRDD = rdd.map(attributes => Row(attributes._1, attributes._2))
+rowRDD: org.apache.spark.rdd.RDD[org.apache.spark.sql.Row] = MapPartitionsRDD[1] at map at <console>:30
+
+scala> val dfFromRDD3 = spark.createDataFrame(rowRDD,schema)
+dfFromRDD3: org.apache.spark.sql.DataFrame = [language: string, language: string]
+
+scala> 
+
+scala> 
+
+scala> val dfFromData1 = data.toDF() 
+dfFromData1: org.apache.spark.sql.DataFrame = [_1: string, _2: string]
+
+scala> 
+
+scala> var dfFromData2 = spark.createDataFrame(data).toDF(columns:_*)
+dfFromData2: org.apache.spark.sql.DataFrame = [language: string, users_count: string]
+
+scala> 
+
+scala> 
+
+scala> 
+
+scala> val data = Seq(Row("Java", "20000"), 
+     |                Row("Python", "100000"), 
+     |                Row("Scala", "3000"))
+data: Seq[org.apache.spark.sql.Row] = List([Java,20000], [Python,100000], [Scala,3000])
+
+scala> var dfFromData3 = spark.createDataFrame(rowData,schema)
+<console>:30: error: not found: value rowData
+       var dfFromData3 = spark.createDataFrame(rowData,schema)
+                                               ^
+
+scala> var dfFromData3 = spark.createDataFrame(data,schema)
+<console>:32: error: overloaded method value createDataFrame with alternatives:
+  (data: java.util.List[_],beanClass: Class[_])org.apache.spark.sql.DataFrame <and>
+  (rdd: org.apache.spark.api.java.JavaRDD[_],beanClass: Class[_])org.apache.spark.sql.DataFrame <and>
+  (rdd: org.apache.spark.rdd.RDD[_],beanClass: Class[_])org.apache.spark.sql.DataFrame <and>
+  (rows: java.util.List[org.apache.spark.sql.Row],schema: org.apache.spark.sql.types.StructType)org.apache.spark.sql.DataFrame <and>
+  (rowRDD: org.apache.spark.api.java.JavaRDD[org.apache.spark.sql.Row],schema: org.apache.spark.sql.types.StructType)org.apache.spark.sql.DataFrame <and>
+  (rowRDD: org.apache.spark.rdd.RDD[org.apache.spark.sql.Row],schema: org.apache.spark.sql.types.StructType)org.apache.spark.sql.DataFrame
+ cannot be applied to (Seq[org.apache.spark.sql.Row], org.apache.spark.sql.types.StructType)
+       var dfFromData3 = spark.createDataFrame(data,schema)
+                               ^
+
+scala> 
