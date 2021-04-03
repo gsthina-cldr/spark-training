@@ -113,3 +113,20 @@ scala> var dfFromData3 = spark.createDataFrame(data,schema)
                                ^
 
 scala> 
+
+scala> val rowData= Seq(Row("Java", "20000"), 
+     |                Row("Python", "100000"), 
+     |                Row("Scala", "3000"))
+rowData: Seq[org.apache.spark.sql.Row] = List([Java,20000], [Python,100000], [Scala,3000])
+
+scala> var dfFromData3 = spark.createDataFrame(rowData,schema)
+<console>:32: error: overloaded method value createDataFrame with alternatives:
+  (data: java.util.List[_],beanClass: Class[_])org.apache.spark.sql.DataFrame <and>
+  (rdd: org.apache.spark.api.java.JavaRDD[_],beanClass: Class[_])org.apache.spark.sql.DataFrame <and>
+  (rdd: org.apache.spark.rdd.RDD[_],beanClass: Class[_])org.apache.spark.sql.DataFrame <and>
+  (rows: java.util.List[org.apache.spark.sql.Row],schema: org.apache.spark.sql.types.StructType)org.apache.spark.sql.DataFrame <and>
+  (rowRDD: org.apache.spark.api.java.JavaRDD[org.apache.spark.sql.Row],schema: org.apache.spark.sql.types.StructType)org.apache.spark.sql.DataFrame <and>
+  (rowRDD: org.apache.spark.rdd.RDD[org.apache.spark.sql.Row],schema: org.apache.spark.sql.types.StructType)org.apache.spark.sql.DataFrame
+ cannot be applied to (Seq[org.apache.spark.sql.Row], org.apache.spark.sql.types.StructType)
+       var dfFromData3 = spark.createDataFrame(rowData,schema)
+                               ^
